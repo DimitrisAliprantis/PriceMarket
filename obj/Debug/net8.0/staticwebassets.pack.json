@@ -1,0 +1,65 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\index.html",
+      "PackagePath": "staticwebassets\\index.html"
+    },
+    {
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\ab.png",
+      "PackagePath": "staticwebassets\\logos\\ab.png"
+    },
+    {
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\bazaar.png",
+      "PackagePath": "staticwebassets\\logos\\bazaar.png"
+    },
+    {
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\chalkiadakis.png",
+      "PackagePath": "staticwebassets\\logos\\chalkiadakis.png"
+    },
+    {
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\galaxias.png",
+      "PackagePath": "staticwebassets\\logos\\galaxias.png"
+    },
+    {
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\kritikos.jpg",
+      "PackagePath": "staticwebassets\\logos\\kritikos.jpg"
+    },
+    {
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\lidl.png",
+      "PackagePath": "staticwebassets\\logos\\lidl.png"
+    },
+    {
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\masoutis.webp",
+      "PackagePath": "staticwebassets\\logos\\masoutis.webp"
+    },
+    {
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\mymarket.jpg",
+      "PackagePath": "staticwebassets\\logos\\mymarket.jpg"
+    },
+    {
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\sklavenitis.png",
+      "PackagePath": "staticwebassets\\logos\\sklavenitis.png"
+    },
+    {
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\synka.jpg",
+      "PackagePath": "staticwebassets\\logos\\synka.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.posokanei.props",
+      "PackagePath": "build\\posokanei.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.posokanei.props",
+      "PackagePath": "buildMultiTargeting\\posokanei.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.posokanei.props",
+      "PackagePath": "buildTransitive\\posokanei.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.posokanei.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

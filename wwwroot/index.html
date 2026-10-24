@@ -1,0 +1,2274 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PosoKanei</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #fafafa;
+            color: #18181b;
+            line-height: 1.5;
+        }
+
+        /* header layout and sticky bar */
+        header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e4e4e7;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #09090b;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            max-width: 860px;
+        }
+
+        .search-bar {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-bar input, .control-select {
+            width: 100%;
+            padding: 8px 12px;
+            background: #f4f4f5;
+            border: 1px solid #d4d4d8;
+            border-radius: 4px;
+            outline: none;
+            font-size: 13px;
+            color: #18181b;
+        }
+
+        .retailer-select {
+            width: 175px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .sort-control-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .sort-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #52525b;
+            white-space: nowrap;
+        }
+
+        .sort-select {
+            width: 155px;
+            cursor: pointer;
+        }
+
+        .search-bar input:focus, .control-select:focus {
+            background: #ffffff;
+            border-color: #18181b;
+        }
+
+        /* floating search autocomplete dropdown */
+        .search-results-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 6px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            max-height: 460px;
+            overflow-y: auto;
+            z-index: 200;
+            display: none;
+        }
+
+        .search-dropdown-header {
+            padding: 10px 16px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #71717a;
+            border-bottom: 1px solid #f4f4f5;
+        }
+
+        .search-dropdown-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            border-bottom: 1px solid #f4f4f5;
+            cursor: pointer;
+            transition: background-color 0.1s ease;
+        }
+
+        .search-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-dropdown-item:hover {
+            background-color: #f4f4f5;
+        }
+
+        .search-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .search-item-thumb {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .search-item-thumb img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .search-item-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .search-item-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #18181b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .search-item-price {
+            font-size: 12px;
+            font-weight: 700;
+            color: #09090b;
+            margin-top: 2px;
+        }
+
+        .search-item-arrow {
+            color: #a1a1aa;
+            font-size: 14px;
+            margin-left: 8px;
+        }
+
+        nav {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        nav a {
+            color: #52525b;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        nav a:hover {
+            color: #09090b;
+        }
+
+        .cart-badge {
+            background-color: #18181b;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 9999px;
+            padding: 1px 6px;
+            display: none;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            color: #71717a;
+        }
+
+        .breadcrumb-item {
+            color: #0066cc;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .breadcrumb-item:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb-separator {
+            color: #a1a1aa;
+        }
+
+        .current-crumb {
+            color: #0066cc;
+            font-weight: 500;
+            cursor: default;
+        }
+
+        .title-area {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            border-bottom: 1px solid #e4e4e7;
+            padding-bottom: 12px;
+        }
+
+        .title-area h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #09090b;
+        }
+
+        .title-area span {
+            color: #71717a;
+            font-size: 13px;
+        }
+
+        /* horizontal chips for leaf subcategories */
+        .subcat-chips-bar {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #f4f4f5;
+            scrollbar-width: thin;
+        }
+
+        .subcat-chip {
+            padding: 6px 14px;
+            border: 1px solid #d4d4d8;
+            background: #ffffff;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #3f3f46;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+        }
+
+        .subcat-chip:hover {
+            border-color: #18181b;
+            color: #09090b;
+        }
+
+        .subcat-chip.active {
+            background: #18181b;
+            color: #ffffff;
+            border-color: #18181b;
+        }
+
+        .img-placeholder {
+            width: 100%;
+            height: 100%;
+            background-color: #f4f4f5;
+            border: 1px dashed #d4d4d8;
+            color: #71717a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* big category cards grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .category-card {
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+            padding: 24px 16px 20px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .category-card:hover {
+            border-color: #18181b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .category-img-container {
+            width: 100%;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .category-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .category-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #09090b;
+            margin-bottom: 4px;
+        }
+
+        .category-card p {
+            font-size: 12px;
+            color: #71717a;
+        }
+
+        /* product listing grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px;
+        }
+
+        .p-card {
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 4px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+
+        .p-card:hover {
+            border-color: #18181b;
+        }
+
+        .p-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 150px;
+            margin-bottom: 12px;
+        }
+
+        .p-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .p-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #18181b;
+            line-height: 1.4;
+            min-height: 36px;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .p-pricing-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-top: auto;
+            padding-bottom: 8px;
+            border-top: 1px solid #f4f4f5;
+            padding-top: 8px;
+        }
+
+        .p-price-label {
+            font-size: 11px;
+            color: #71717a;
+        }
+
+        .p-main-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #09090b;
+        }
+
+        .p-add-btn {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #18181b;
+            color: #18181b;
+            border-radius: 4px;
+            padding: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .p-add-btn:hover {
+            background: #18181b;
+            color: #ffffff;
+        }
+
+        /* product detail split layout */
+        .product-split-layout {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .product-split-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .product-left-panel {
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .product-left-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .product-detail-thumb {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .product-detail-thumb img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .product-detail-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .product-detail-label {
+            font-size: 11px;
+            color: #71717a;
+        }
+
+        .product-detail-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #09090b;
+            line-height: 1.3;
+        }
+
+        .product-action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-add-main {
+            background: #ffffff;
+            border: 1px solid #0066cc;
+            color: #0066cc;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-add-main:hover {
+            background: #f0f7ff;
+        }
+
+        /* store price cards in detail view */
+        .store-cards-col {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .store-price-card {
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 10px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .store-card-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* unified store logo and badge box */
+        .store-brand-logo {
+            width: 56px;
+            height: 38px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            font-size: 11px;
+            font-weight: 700;
+            color: #3f3f46;
+            overflow: hidden;
+            text-transform: uppercase;
+            padding: 3px;
+        }
+
+        .store-brand-logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .store-name-text {
+            font-size: 15px;
+            font-weight: 600;
+            color: #09090b;
+        }
+
+        .store-card-right {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .store-best-tag {
+            font-size: 11px;
+            font-weight: 600;
+            color: #16a34a;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 2px;
+        }
+
+        .store-price-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #09090b;
+        }
+
+        .store-unit-value {
+            font-size: 11px;
+            color: #71717a;
+        }
+
+        /* shopping list layout */
+        .cart-gov-layout {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .cart-gov-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .cart-left-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .list-name-card {
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .list-icon-box {
+            width: 48px;
+            height: 48px;
+            background-color: #e0f2fe;
+            color: #0284c7;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .list-name-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .list-name-sub {
+            font-size: 12px;
+            color: #71717a;
+        }
+
+        .list-name-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #09090b;
+        }
+
+        .cart-products-card {
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .cart-products-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: #09090b;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f4f4f5;
+            margin-bottom: 12px;
+        }
+
+        .cart-gov-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f4f4f5;
+        }
+
+        .cart-gov-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-gov-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .cart-gov-thumb {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .cart-gov-thumb img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .cart-gov-details {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .cart-gov-title {
+            font-size: 12px;
+            font-weight: 500;
+            color: #18181b;
+            line-height: 1.3;
+            cursor: pointer;
+        }
+
+        .cart-gov-title:hover {
+            color: #0284c7;
+            text-decoration: underline;
+        }
+
+        .cart-gov-qty-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #52525b;
+        }
+
+        .cart-gov-qty-btn-minus {
+            width: 26px;
+            height: 24px;
+            background: #f4f4f5;
+            border: 1px solid #d4d4d8;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #52525b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-gov-qty-btn-plus {
+            width: 26px;
+            height: 24px;
+            background: #0066cc;
+            border: 1px solid #0066cc;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-gov-qty-num {
+            font-weight: 700;
+            color: #09090b;
+            min-width: 14px;
+            text-align: center;
+        }
+
+        .cart-gov-delete-btn {
+            width: 28px;
+            height: 28px;
+            background-color: #ef4444;
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: opacity 0.15s;
+        }
+
+        .cart-gov-delete-btn:hover {
+            opacity: 0.85;
+        }
+
+        .cart-right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .retailers-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 15px;
+            font-weight: 700;
+            color: #09090b;
+            margin-bottom: 4px;
+        }
+
+        .retailer-accordion-card {
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.15s;
+        }
+
+        .retailer-accordion-card:hover {
+            border-color: #d4d4d8;
+        }
+
+        .retailer-card-summary {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .retailer-summary-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .retailer-title-box h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #09090b;
+            margin-bottom: 2px;
+        }
+
+        .retailer-avail-text {
+            font-size: 12px;
+            color: #52525b;
+        }
+
+        .avail-highlight {
+            font-weight: 700;
+        }
+
+        .avail-green {
+            color: #16a34a;
+        }
+
+        .avail-amber {
+            color: #ea580c;
+        }
+
+        .retailer-summary-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-align: right;
+        }
+
+        .retailer-total-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #09090b;
+        }
+
+        .retailer-chevron {
+            font-size: 14px;
+            color: #71717a;
+            transition: transform 0.2s ease;
+        }
+
+        .retailer-chevron.expanded {
+            transform: rotate(90deg);
+        }
+
+        .retailer-card-details {
+            display: none;
+            padding: 16px 20px 20px;
+            border-top: 1px solid #f4f4f5;
+            background-color: #ffffff;
+        }
+
+        .retailer-card-details.open {
+            display: block;
+        }
+
+        .detailed-product-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f4f4f5;
+        }
+
+        .detailed-product-row:last-child {
+            border-bottom: none;
+        }
+
+        .detailed-product-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .detailed-product-thumb {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .detailed-product-thumb img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .detailed-product-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #18181b;
+            cursor: pointer;
+        }
+
+        .detailed-product-name:hover {
+            color: #0066cc;
+            text-decoration: underline;
+        }
+
+        .detailed-product-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .detailed-product-price {
+            font-size: 15px;
+            font-weight: 700;
+            color: #09090b;
+        }
+
+        .btn-inspect-prices {
+            width: 32px;
+            height: 32px;
+            background-color: #0066cc;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .badge-out-of-stock {
+            font-size: 11px;
+            font-weight: 600;
+            color: #ea580c;
+            background-color: #fff7ed;
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid #ffedd5;
+        }
+
+        /* modal comparison popup */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 520px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            position: relative;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #71717a;
+            cursor: pointer;
+        }
+
+        .modal-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #09090b;
+            padding-right: 24px;
+            line-height: 1.4;
+        }
+
+        .modal-prices-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .modal-price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+        }
+
+        .modal-price-row.cheapest-row {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+
+        .modal-store-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-cheapest-badge {
+            font-size: 10px;
+            font-weight: 700;
+            background: #16a34a;
+            color: #ffffff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+
+        .modal-price-val {
+            font-size: 15px;
+            font-weight: 700;
+            color: #09090b;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #18181b;
+            color: #ffffff;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            z-index: 1100;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: none;
+        }
+
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo" onclick="resetToRoot()">PosoKanei</div>
+
+        <div class="header-controls">
+            <!-- supermarket chain dropdown filter -->
+            <select id="supermarketFilter" class="control-select retailer-select" onchange="onRetailerFilterChange(this.value)">
+                <option value="">Όλα τα καταστήματα</option>
+                <option value="lidl">Lidl</option>
+                <option value="σκλαβενιτης">Σκλαβενίτης</option>
+                <option value="αβ βασιλοπουλος">ΑΒ Βασιλόπουλος</option>
+                <option value="my market">My market</option>
+                <option value="μασουτης">Μασούτης</option>
+                <option value="γαλαξιας">Γαλαξίας</option>
+                <option value="κρητικος">Κρητικός</option>
+            </select>
+
+            <!-- price sorting dropdown with external label -->
+            <div class="sort-control-group">
+                <span class="sort-label">Τιμή:</span>
+                <select id="sortOrderSelect" class="control-select sort-select" onchange="onSortOrderChange(this.value)">
+                    <option value="default">Προεπιλογή</option>
+                    <option value="price-asc">Χαμηλή &rarr; Υψηλή</option>
+                    <option value="price-desc">Υψηλή &rarr; Χαμηλή</option>
+                </select>
+            </div>
+
+            <!-- debounced product search input with popup dropdown -->
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Αναζήτηση προϊόντων..." autocomplete="off">
+                <div id="searchDropdown" class="search-results-dropdown"></div>
+            </div>
+        </div>
+
+        <nav>
+            <a href="#" onclick="resetToRoot()">Αρχική</a>
+            <a href="#" onclick="viewShoppingList()">
+                Λίστα 
+                <span id="cartCount" class="cart-badge">0</span>
+            </a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="breadcrumbs" id="breadcrumbs"></div>
+
+        <div class="title-area" id="titleArea">
+            <h1 id="viewTitle">Κατηγορίες</h1>
+            <span id="itemsCount"></span>
+        </div>
+
+        <div id="subcatChipsContainer" class="subcat-chips-bar" style="display: none;"></div>
+
+        <div id="dynamicContainer"></div>
+    </main>
+
+    <!-- modal popup to inspect product across all supermarkets from shopping list -->
+    <div id="priceComparisonModal" class="modal-overlay" onclick="closePriceModal(event)">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closePriceModal()">&times;</button>
+            <h3 id="modalProductTitle" class="modal-title">Σύγκριση</h3>
+            <div id="modalProductPrices" class="modal-prices-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const CART_STORAGE_KEY = 'posokanei_shopping_cart';
+        let navHistory = [{ type: 'cat', id: null, name: 'Αρχική' }];
+        let selectedRetailer = '';
+        let currentSortOrder = 'default';
+        let currentLoadedProducts = [];
+        let searchDebounceTimer = null;
+
+        // In-memory cache for supermarket logos fetched from SQLite database
+        const supermarketLogos = {};
+
+        // normalize string by stripping accents and converting to lowercase
+        function normalizeStr(str) {
+            return (str || '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .trim();
+        }
+
+        /*
+         * Resolves image URLs.
+         * If the URL starts with /logos/, it is served directly from the local wwwroot folder.
+         * Otherwise, it prepends posokanei.gov.gr for external product images.
+         */
+        function formatImageUrl(url) {
+            if (!url) return null;
+            if (url.startsWith('http://') || url.startsWith('https://')) return url;
+            if (url.startsWith('/logos/')) return url; // Local static assets
+            return `https://posokanei.gov.gr${url.startsWith('/') ? '' : '/'}${url}`;
+        }
+
+        /*
+         * Fetches supermarket names and logo URLs from the database on app startup.
+         * Stores the local path (e.g. /logos/sklavenitis.png) in the cache dictionary.
+         */
+        async function loadSupermarketLogos() {
+            try {
+                const response = await fetch('/api/supermarkets');
+                if (!response.ok) return;
+
+                const stores = await response.json();
+                stores.forEach(store => {
+                    const name = typeof store === 'string' ? store : store.name;
+                    const rawLogo = typeof store === 'object' ? (store.logoUrl || store.logoURL) : null;
+                    if (name && rawLogo) {
+                        supermarketLogos[normalizeStr(name)] = formatImageUrl(rawLogo);
+                    }
+                });
+            } catch (err) {
+                console.error("Failed to load supermarket logos from DB:", err);
+            }
+        }
+
+        /*
+         * Generates the supermarket brand box.
+         * Renders the local image logo or falls back to text badges if missing or broken.
+         */
+        function getRetailerLogoHtml(name) {
+            const clean = normalizeStr(name);
+            const logoUrl = supermarketLogos[clean];
+
+            if (logoUrl) {
+                return `
+                    <div class="store-brand-logo">
+                        <img src="${logoUrl}" alt="${name}" onerror="this.outerHTML=renderFallbackBadge('${name.replace(/'/g, "\\'")}')" />
+                    </div>
+                `;
+            }
+
+            return renderFallbackBadge(name);
+        }
+
+        // Helper to produce customized colored text badges when image logos are unavailable
+        function renderFallbackBadge(name) {
+            const clean = normalizeStr(name);
+            let bg = '#ffffff';
+            let color = '#18181b';
+            let short = (name || '').substring(0, 3).toUpperCase();
+            let border = '#e4e4e7';
+
+            if (clean.includes('σκλαβενιτ')) {
+                bg = '#fff5f5'; color = '#b91c1c'; short = 'ΣΚΛ'; border = '#fecaca';
+            } else if (clean.includes('αβ') || clean.includes('βασιλοπ')) {
+                bg = '#eff6ff'; color = '#1d4ed8'; short = 'ΑΒ'; border = '#bfdbfe';
+            } else if (clean.includes('lidl')) {
+                bg = '#fef9c3'; color = '#1d4ed8'; short = 'LIDL'; border = '#fef08a';
+            } else if (clean.includes('my market') || clean.includes('mymarket')) {
+                bg = '#f0fdf4'; color = '#15803d'; short = 'MY'; border = '#bbf7d0';
+            } else if (clean.includes('μασουτ')) {
+                bg = '#fff1f2'; color = '#e11d48'; short = 'ΜΑΣ'; border = '#fecdd3';
+            } else if (clean.includes('γαλαξι')) {
+                bg = '#eff6ff'; color = '#0284c7'; short = 'ΓΑΛ'; border = '#bae6fd';
+            } else if (clean.includes('κρητικ')) {
+                bg = '#fff7ed'; color = '#c2410c'; short = 'ΚΡΗ'; border = '#fed7aa';
+            } else if (clean.includes('χαλκιαδ')) {
+                bg = '#f0fdfa'; color = '#0f766e'; short = 'ΧΑΛ'; border = '#99f6e4';
+            } else if (clean.includes('bazaar')) {
+                bg = '#fdf4ff'; color = '#a21caf'; short = 'BAZ'; border = '#f5d0fe';
+            }
+
+            return `<div class="store-brand-logo" style="background:${bg}; color:${color}; border-color:${border};">${short}</div>`;
+        }
+
+        // handle changes to active supermarket filter
+        function onRetailerFilterChange(val) {
+            selectedRetailer = normalizeStr(val);
+            const current = navHistory[navHistory.length - 1];
+
+            if ((current.type === 'cat' && current.id !== null) || current.type === 'search') {
+                renderProductsGrid(currentLoadedProducts);
+            } else if (current.type === 'product' && current.productData) {
+                openProductDetails(current.productData);
+            } else if (current.type === 'cart') {
+                viewShoppingList();
+            }
+        }
+
+        // handle price sort order change
+        function onSortOrderChange(val) {
+            currentSortOrder = val;
+            const current = navHistory[navHistory.length - 1];
+
+            if ((current.type === 'cat' && current.id !== null) || current.type === 'search') {
+                renderProductsGrid(currentLoadedProducts);
+            }
+        }
+
+        // read items from localstorage
+        function getCart() {
+            try {
+                return JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        // persist cart to localstorage and sync badge
+        function saveCart(cart) {
+            localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+            updateCartBadge();
+        }
+
+        // add product or increment quantity
+        function addToList(product) {
+            const cart = getCart();
+            const existingIndex = cart.findIndex(item => item.id === product.id);
+
+            if (existingIndex > -1) {
+                cart[existingIndex].quantity = (cart[existingIndex].quantity || 1) + 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name || 'Προϊόν',
+                    imageUrl: product.imageURL || product.imageUrl || null,
+                    minimumPrice: product.minimumPrice !== null && product.minimumPrice !== undefined ? Number(product.minimumPrice) : null,
+                    quantity: 1
+                });
+            }
+
+            saveCart(cart);
+            showToast(`Προστέθηκε: ${product.name}`);
+        }
+
+        // adjust quantity in cart
+        function updateQuantity(productId, delta) {
+            let cart = getCart();
+            const item = cart.find(i => i.id === productId);
+            if (!item) return;
+
+            item.quantity += delta;
+            if (item.quantity <= 0) {
+                cart = cart.filter(i => i.id !== productId);
+            }
+
+            saveCart(cart);
+            viewShoppingList();
+        }
+
+        // remove item completely from cart
+        function removeFromCart(productId) {
+            let cart = getCart();
+            cart = cart.filter(i => i.id !== productId);
+            saveCart(cart);
+            viewShoppingList();
+        }
+
+        // empty all items from cart
+        function clearCart() {
+            if (confirm('Εκκαθάριση λίστας;')) {
+                saveCart([]);
+                viewShoppingList();
+            }
+        }
+
+        // sync header badge count with cart total
+        function updateCartBadge() {
+            const cart = getCart();
+            const badge = document.getElementById('cartCount');
+            const total = cart.reduce((acc, item) => acc + (item.quantity || 1), 0);
+
+            if (total > 0) {
+                badge.textContent = total;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // display brief toast message
+        function showToast(text) {
+            let toast = document.getElementById('toastNotification');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toastNotification';
+                toast.className = 'toast-msg';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = text;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        /* ========================================================
+           FULL PRODUCT DETAIL VIEW (SPLIT LAYOUT)
+           ======================================================== */
+        async function openProductDetails(product) {
+            hideSearchDropdown();
+            navHistory.push({ type: 'product', id: product.id, name: product.name, productData: product });
+            renderBreadcrumbs();
+
+            document.getElementById('titleArea').style.display = 'none';
+            document.getElementById('subcatChipsContainer').style.display = 'none';
+            const container = document.getElementById('dynamicContainer');
+
+            const rawImg = product.imageURL || product.imageUrl || null;
+            const imgSrc = formatImageUrl(rawImg);
+            const imgHtml = imgSrc 
+                ? `<img src="${imgSrc}" alt="${product.name || ''}" onerror="this.onerror=null; this.outerHTML='<div class=\\'img-placeholder\\'>[ IMG ]</div>';">`
+                : `<div class="img-placeholder">[ IMG ]</div>`;
+
+            container.innerHTML = `
+                <div class="product-split-layout">
+                    <!-- left card -->
+                    <div class="product-left-panel">
+                        <div class="product-left-header">
+                            <div class="product-detail-thumb">
+                                ${imgHtml}
+                            </div>
+                            <div class="product-detail-info">
+                                <span class="product-detail-label">Προϊόν</span>
+                                <h2 class="product-detail-title">${product.name || ''}</h2>
+                            </div>
+                        </div>
+                        <div class="product-action-buttons">
+                            <button class="btn-add-main" onclick="addToList(navHistory[navHistory.length - 1].productData)">
+                                + Προσθήκη σε Λίστα
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- right supermarket price cards -->
+                    <div class="store-cards-col">
+                        <div style="font-size: 15px; font-weight: 700; color: #09090b; margin-bottom: 4px;">Supermarket</div>
+                        <div id="productStoresList"><p style="color:#71717a; font-size:13px;">Φόρτωση τιμών...</p></div>
+                    </div>
+                </div>
+            `;
+
+            try {
+                const res = await fetch(`/api/productprices?productId=${encodeURIComponent(product.id)}`);
+                const listContainer = document.getElementById('productStoresList');
+
+                if (!res.ok) {
+                    listContainer.innerHTML = `<p style="color:#71717a; font-size:13px;">Δεν υπάρχουν διαθέσιμες τιμές.</p>`;
+                    return;
+                }
+
+                const prices = await res.json();
+                if (!prices || prices.length === 0) {
+                    listContainer.innerHTML = `<p style="color:#71717a; font-size:13px;">Δεν βρέθηκαν τιμές.</p>`;
+                    return;
+                }
+
+                const validPrices = prices.filter(p => p.price !== null && p.price !== undefined).map(p => Number(p.price));
+                const minVal = validPrices.length > 0 ? Math.min(...validPrices) : null;
+
+                prices.sort((a, b) => {
+                    if (selectedRetailer) {
+                        const aMatch = normalizeStr(a.retailerName).includes(selectedRetailer);
+                        const bMatch = normalizeStr(b.retailerName).includes(selectedRetailer);
+                        if (aMatch && !bMatch) return -1;
+                        if (!aMatch && bMatch) return 1;
+                    }
+                    return (Number(a.price) || 0) - (Number(b.price) || 0);
+                });
+
+                listContainer.innerHTML = prices.map(rp => {
+                    const isBest = (minVal !== null && Number(rp.price) === minVal);
+                    const priceFormatted = (rp.price !== null && rp.price !== undefined) ? `${Number(rp.price).toFixed(2)}€` : '--€';
+                    const unitPriceFormatted = (rp.unitPrice !== null && rp.unitPrice !== undefined) ? `${Number(rp.unitPrice).toFixed(2)}€/μον.` : '';
+
+                    return `
+                        <div class="store-price-card">
+                            <div class="store-card-left">
+                                ${getRetailerLogoHtml(rp.retailerName)}
+                                <span class="store-name-text">${rp.retailerName}</span>
+                            </div>
+                            <div class="store-card-right">
+                                ${isBest ? '<span class="store-best-tag">&#127941; Καλύτερη Τιμή</span>' : ''}
+                                <span class="store-price-value">${priceFormatted}</span>
+                                ${unitPriceFormatted ? `<span class="store-unit-value">${unitPriceFormatted}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                document.getElementById('productStoresList').innerHTML = `<p style="color:#71717a; font-size:13px;">Σφάλμα: ${err.message}</p>`;
+            }
+        }
+
+        /* ========================================================
+           POSOKANEI SHOPPING LIST VIEW & ACCORDIONS
+           ======================================================== */
+        async function viewShoppingList() {
+            navHistory = [{ type: 'cat', id: null, name: 'Αρχική' }, { type: 'cart', id: 'cart', name: 'Ψώνια Εβδομάδας' }];
+            renderBreadcrumbs();
+
+            document.getElementById('titleArea').style.display = 'none';
+            document.getElementById('subcatChipsContainer').style.display = 'none';
+            const container = document.getElementById('dynamicContainer');
+            const cart = getCart();
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 40px 16px; border: 1px dashed #d4d4d8; text-align: center; border-radius: 8px;">
+                        <p style="color:#71717a; font-size:14px; margin-bottom: 12px;">Η λίστα είναι άδεια.</p>
+                        <button class="p-add-btn" style="width: auto; padding: 6px 16px; margin: 0 auto;" onclick="resetToRoot()">
+                            Επιστροφή στις κατηγορίες
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="cart-gov-layout">
+                    <!-- left column: cart overview -->
+                    <div class="cart-left-col">
+                        <div class="list-name-card">
+                            <div class="list-icon-box">&#9776;</div>
+                            <div class="list-name-info">
+                                <span class="list-name-sub">Λίστα</span>
+                                <span class="list-name-title">Ψώνια Εβδομάδας</span>
+                            </div>
+                        </div>
+
+                        <div class="cart-products-card">
+                            <div class="cart-products-header">
+                                <span>Προϊόντα στη Λίστα</span>
+                                <span>&#9650;</span>
+                            </div>
+                            <div id="cartItemsList">
+                                ${cart.map(item => {
+                                    const imgSrc = formatImageUrl(item.imageUrl);
+                                    const imgHtml = imgSrc
+                                        ? `<img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.outerHTML='<div class=\\'img-placeholder\\' style=\\'font-size:9px;\\'>[ IMG ]</div>';">`
+                                        : `<div class="img-placeholder" style="font-size:9px;">[ IMG ]</div>`;
+
+                                    return `
+                                        <div class="cart-gov-item">
+                                            <div class="cart-gov-item-left">
+                                                <div class="cart-gov-thumb" onclick="openProductPriceModal('${item.id}', '${item.name.replace(/'/g, "\\'")}')">
+                                                    ${imgHtml}
+                                                </div>
+                                                <div class="cart-gov-details">
+                                                    <span class="cart-gov-title" onclick="openProductPriceModal('${item.id}', '${item.name.replace(/'/g, "\\'")}')">${item.name}</span>
+                                                    <div class="cart-gov-qty-row">
+                                                        <span>Ποσότητα:</span>
+                                                        <button class="cart-gov-qty-btn-minus" onclick="updateQuantity('${item.id}', -1)">-</button>
+                                                        <span class="cart-gov-qty-num">${item.quantity}</span>
+                                                        <button class="cart-gov-qty-btn-plus" onclick="updateQuantity('${item.id}', 1)">+</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button class="cart-gov-delete-btn" onclick="removeFromCart('${item.id}')" title="Διαγραφή">&times;</button>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- right column: store comparison with expandable accordions -->
+                    <div class="cart-right-col">
+                        <div class="retailers-top-bar">
+                            <span>&#9660; Καταστήματα</span>
+                            <span style="font-size: 13px; font-weight: 500; color: #71717a;">Τιμή: Χαμηλότερη &#9660;</span>
+                        </div>
+                        <div id="retailersAccordionList">
+                            <p style="color:#71717a; font-size:13px;">Υπολογισμός τιμών ανά κατάστημα...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            await buildRetailersAccordion(cart);
+        }
+
+        // fetch prices and build expandable store cards
+        async function buildRetailersAccordion(cart) {
+            const accordionContainer = document.getElementById('retailersAccordionList');
+
+            try {
+                const pricePromises = cart.map(item =>
+                    fetch(`/api/productprices?productId=${encodeURIComponent(item.id)}`)
+                        .then(r => r.ok ? r.json() : [])
+                        .catch(() => [])
+                );
+
+                const allProductsPrices = await Promise.all(pricePromises);
+                const storeStats = {};
+
+                cart.forEach((cartItem, index) => {
+                    const pricesForProduct = allProductsPrices[index] || [];
+
+                    pricesForProduct.forEach(rp => {
+                        if (rp.price !== null && rp.price !== undefined) {
+                            const retailer = rp.retailerName || 'Άγνωστο';
+                            if (!storeStats[retailer]) {
+                                storeStats[retailer] = {
+                                    name: retailer,
+                                    totalPrice: 0,
+                                    foundItems: [],
+                                    missingItems: []
+                                };
+                            }
+                            storeStats[retailer].totalPrice += (Number(rp.price) * cartItem.quantity);
+                            storeStats[retailer].foundItems.push({
+                                product: cartItem,
+                                unitPrice: Number(rp.price),
+                                lineTotal: Number(rp.price) * cartItem.quantity
+                            });
+                        }
+                    });
+                });
+
+                Object.values(storeStats).forEach(store => {
+                    cart.forEach(cartItem => {
+                        const isFound = store.foundItems.some(f => f.product.id === cartItem.id);
+                        if (!isFound) {
+                            store.missingItems.push(cartItem);
+                        }
+                    });
+                });
+
+                let results = Object.values(storeStats);
+                const totalListItems = cart.length;
+
+                if (results.length === 0) {
+                    accordionContainer.innerHTML = '<p style="color:#71717a; font-size:13px;">Δεν βρέθηκαν τιμές.</p>';
+                    return;
+                }
+
+                results.sort((a, b) => {
+                    if (selectedRetailer) {
+                        const aMatch = normalizeStr(a.name).includes(selectedRetailer);
+                        const bMatch = normalizeStr(b.name).includes(selectedRetailer);
+                        if (aMatch && !bMatch) return -1;
+                        if (!aMatch && bMatch) return 1;
+                    }
+                    if (a.foundItems.length === totalListItems && b.foundItems.length !== totalListItems) return -1;
+                    if (b.foundItems.length === totalListItems && a.foundItems.length !== totalListItems) return 1;
+                    return a.totalPrice - b.totalPrice;
+                });
+
+                accordionContainer.innerHTML = results.map((store, sIndex) => {
+                    const isComplete = store.foundItems.length === totalListItems;
+                    const availColorClass = isComplete ? 'avail-green' : 'avail-amber';
+
+                    return `
+                        <div class="retailer-accordion-card" id="retailerCard_${sIndex}">
+                            <div class="retailer-card-summary" onclick="toggleStoreAccordion(${sIndex})">
+                                <div class="retailer-summary-left">
+                                    ${getRetailerLogoHtml(store.name)}
+                                    <div class="retailer-title-box">
+                                        <h3>${store.name}</h3>
+                                        <div class="retailer-avail-text">
+                                            Διαθέσιμα: <span class="avail-highlight ${availColorClass}">${store.foundItems.length} από ${totalListItems}</span> στη λίστα σου
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="retailer-summary-right">
+                                    <span class="retailer-total-amount">${store.totalPrice.toFixed(2)}€</span>
+                                    <span class="retailer-chevron" id="chevron_${sIndex}">&rsaquo;</span>
+                                </div>
+                            </div>
+
+                            <div class="retailer-card-details" id="details_${sIndex}">
+                                <!-- available products -->
+                                ${store.foundItems.map(item => {
+                                    const imgSrc = formatImageUrl(item.product.imageUrl);
+                                    const imgHtml = imgSrc
+                                        ? `<img src="${imgSrc}" alt="${item.product.name}" onerror="this.onerror=null; this.outerHTML='<div class=\\'img-placeholder\\' style=\\'font-size:8px;\\'>[ IMG ]</div>';">`
+                                        : `<div class="img-placeholder" style="font-size:8px;">[ IMG ]</div>`;
+
+                                    return `
+                                        <div class="detailed-product-row">
+                                            <div class="detailed-product-left">
+                                                <div class="detailed-product-thumb" onclick="openProductPriceModal('${item.product.id}', '${item.product.name.replace(/'/g, "\\'")}')">
+                                                    ${imgHtml}
+                                                </div>
+                                                <span class="detailed-product-name" onclick="openProductPriceModal('${item.product.id}', '${item.product.name.replace(/'/g, "\\'")}')">
+                                                    ${item.product.name}
+                                                </span>
+                                            </div>
+                                            <div class="detailed-product-right">
+                                                <span class="detailed-product-price">${item.unitPrice.toFixed(2)}€</span>
+                                                <button class="btn-inspect-prices" onclick="openProductPriceModal('${item.product.id}', '${item.product.name.replace(/'/g, "\\'")}')" title="Δες τιμές σε άλλα σούπερ μάρκετ">
+                                                    &#128269;
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+
+                                <!-- missing products -->
+                                ${store.missingItems.map(mItem => {
+                                    const imgSrc = formatImageUrl(mItem.imageUrl);
+                                    const imgHtml = imgSrc
+                                        ? `<img src="${imgSrc}" alt="${mItem.name}" onerror="this.onerror=null; this.outerHTML='<div class=\\'img-placeholder\\' style=\\'font-size:8px;\\'>[ IMG ]</div>';">`
+                                        : `<div class="img-placeholder" style="font-size:8px;">[ IMG ]</div>`;
+
+                                    return `
+                                        <div class="detailed-product-row" style="opacity: 0.7;">
+                                            <div class="detailed-product-left">
+                                                <div class="detailed-product-thumb" onclick="openProductPriceModal('${mItem.id}', '${mItem.name.replace(/'/g, "\\'")}')">
+                                                    ${imgHtml}
+                                                </div>
+                                                <span class="detailed-product-name" onclick="openProductPriceModal('${mItem.id}', '${mItem.name.replace(/'/g, "\\'")}')">
+                                                    ${mItem.name}
+                                                </span>
+                                            </div>
+                                            <div class="detailed-product-right">
+                                                <span class="badge-out-of-stock">Μη διαθέσιμο</span>
+                                                <button class="btn-inspect-prices" onclick="openProductPriceModal('${mItem.id}', '${mItem.name.replace(/'/g, "\\'")}')" title="Δες πού υπάρχει">
+                                                    &#128269;
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                accordionContainer.innerHTML = `<p style="color:#71717a; font-size:13px;">Σφάλμα: ${err.message}</p>`;
+            }
+        }
+
+        function toggleStoreAccordion(index) {
+            const details = document.getElementById(`details_${index}`);
+            const chevron = document.getElementById(`chevron_${index}`);
+
+            if (!details || !chevron) return;
+
+            const isOpen = details.classList.contains('open');
+            if (isOpen) {
+                details.classList.remove('open');
+                chevron.classList.remove('expanded');
+            } else {
+                details.classList.add('open');
+                chevron.classList.add('expanded');
+            }
+        }
+
+        // open modal comparing prices across all supermarkets (from shopping list)
+        async function openProductPriceModal(productId, productName) {
+            const modal = document.getElementById('priceComparisonModal');
+            const title = document.getElementById('modalProductTitle');
+            const list = document.getElementById('modalProductPrices');
+
+            title.textContent = `Σύγκριση: ${productName}`;
+            list.innerHTML = '<p style="color:#71717a; font-size:13px;">Φόρτωση τιμών...</p>';
+            modal.style.display = 'flex';
+
+            try {
+                const res = await fetch(`/api/productprices?productId=${encodeURIComponent(productId)}`);
+                if (!res.ok) {
+                    list.innerHTML = '<p style="color:#71717a; font-size:13px;">Δεν βρέθηκαν τιμές.</p>';
+                    return;
+                }
+
+                const prices = await res.json();
+                if (!prices || prices.length === 0) {
+                    list.innerHTML = '<p style="color:#71717a; font-size:13px;">Δεν υπάρχουν διαθέσιμες τιμές.</p>';
+                    return;
+                }
+
+                const validPrices = prices.filter(p => p.price !== null && p.price !== undefined).map(p => Number(p.price));
+                const minVal = validPrices.length > 0 ? Math.min(...validPrices) : null;
+
+                prices.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+
+                list.innerHTML = prices.map(rp => {
+                    const isCheapest = minVal !== null && Number(rp.price) === minVal;
+                    const priceFormatted = (rp.price !== null && rp.price !== undefined) ? `${Number(rp.price).toFixed(2)}€` : '--€';
+
+                    return `
+                        <div class="modal-price-row ${isCheapest ? 'cheapest-row' : ''}">
+                            <div class="modal-store-left">
+                                ${getRetailerLogoHtml(rp.retailerName)}
+                                <strong style="font-size:14px; color:#09090b;">${rp.retailerName}</strong>
+                                ${isCheapest ? '<span class="modal-cheapest-badge">Φθηνότερο</span>' : ''}
+                            </div>
+                            <span class="modal-price-val">${priceFormatted}</span>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                list.innerHTML = `<p style="color:#71717a; font-size:13px;">Σφάλμα: ${err.message}</p>`;
+            }
+        }
+
+        function closePriceModal() {
+            const modal = document.getElementById('priceComparisonModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        /* ========================================================
+           CATEGORY & PRODUCT BROWSING
+           ======================================================== */
+        async function loadNavigation(parentId = null) {
+            renderBreadcrumbs();
+            document.getElementById('titleArea').style.display = 'flex';
+            const container = document.getElementById('dynamicContainer');
+            const chipsBar = document.getElementById('subcatChipsContainer');
+            const countLabel = document.getElementById('itemsCount');
+            
+            countLabel.textContent = '';
+            chipsBar.style.display = 'none';
+            chipsBar.innerHTML = '';
+            container.innerHTML = '<p style="color:#71717a; font-size:13px;">Φόρτωση...</p>';
+
+            try {
+                const url = parentId ? `/api/categories?parentId=${parentId}` : '/api/categories';
+                const res = await fetch(url);
+                const categories = await res.json();
+
+                const hasDeeperCategories = categories.some(cat => (cat.subCategoryCount || 0) > 0);
+
+                if (categories.length > 0 && hasDeeperCategories) {
+                    countLabel.textContent = `${categories.length} κατηγορίες`;
+                    container.innerHTML = '<div class="category-grid" id="catGrid"></div>';
+                    const catGrid = document.getElementById('catGrid');
+
+                    categories.forEach(cat => {
+                        const card = document.createElement('div');
+                        card.className = 'category-card';
+
+                        const rawImg = cat.imageURL || cat.imageUrl || null;
+                        const imgSrc = formatImageUrl(rawImg);
+
+                        const imgHtml = imgSrc 
+                            ? `<img src="${imgSrc}" class="category-img" alt="${cat.name}" loading="lazy" onerror="this.onerror=null; this.outerHTML='<div class=\\'img-placeholder\\'>[ IMG ]</div>';">`
+                            : `<div class="img-placeholder">[ IMG ]</div>`;
+
+                        card.innerHTML = `
+                            <div class="category-img-container">
+                                ${imgHtml}
+                            </div>
+                            <h3>${cat.name}</h3>
+                            <p>Προβολή</p>
+                        `;
+
+                        card.onclick = () => {
+                            navHistory.push({ type: 'cat', id: cat.id, name: cat.name });
+                            loadNavigation(cat.id);
+                        };
+                        catGrid.appendChild(card);
+                    });
+
+                } else {
+                    container.innerHTML = '<p style="color:#71717a; font-size:13px;">Φόρτωση προϊόντων...</p>';
+
+                    const prodsRes = await fetch(`/api/products?categoryId=${parentId}`);
+                    const products = prodsRes.ok ? await prodsRes.json() : [];
+                    currentLoadedProducts = products;
+
+                    if (categories.length > 0) {
+                        chipsBar.style.display = 'flex';
+                        chipsBar.innerHTML = '';
+
+                        const allChip = document.createElement('button');
+                        allChip.className = 'subcat-chip active';
+                        allChip.textContent = `Όλα (${products.length})`;
+                        allChip.onclick = () => {
+                            document.querySelectorAll('.subcat-chip').forEach(c => c.classList.remove('active'));
+                            allChip.classList.add('active');
+                            renderProductsGrid(currentLoadedProducts);
+                        };
+                        chipsBar.appendChild(allChip);
+
+                        categories.forEach(sub => {
+                            const chip = document.createElement('button');
+                            chip.className = 'subcat-chip';
+                            chip.textContent = sub.name;
+                            chip.onclick = async () => {
+                                document.querySelectorAll('.subcat-chip').forEach(c => c.classList.remove('active'));
+                                chip.classList.add('active');
+                                
+                                container.innerHTML = '<p style="color:#71717a; font-size:13px;">Φόρτωση επιλεγμένων προϊόντων...</p>';
+                                const subProdsRes = await fetch(`/api/products?categoryId=${sub.id}`);
+                                const subProducts = subProdsRes.ok ? await subProdsRes.json() : [];
+                                renderProductsGrid(subProducts);
+                            };
+                            chipsBar.appendChild(chip);
+                        });
+                    }
+
+                    renderProductsGrid(products);
+                }
+
+            } catch (err) {
+                container.innerHTML = `<p style="color:#71717a; font-size:13px;">Σφάλμα κατά τη φόρτωση: ${err.message}</p>`;
+            }
+        }
+
+        async function renderProductsGrid(products) {
+            const container = document.getElementById('dynamicContainer');
+            const countLabel = document.getElementById('itemsCount');
+
+            let displayProducts = [...products];
+
+            if (selectedRetailer) {
+                container.innerHTML = '<p style="color:#71717a; font-size:13px;">Φιλτράρισμα βάσει καταστήματος...</p>';
+
+                const pricePromises = displayProducts.map(p =>
+                    fetch(`/api/productprices?productId=${encodeURIComponent(p.id)}`)
+                        .then(r => r.ok ? r.json() : [])
+                        .catch(() => [])
+                );
+
+                const allPrices = await Promise.all(pricePromises);
+
+                const filtered = [];
+                displayProducts.forEach((p, index) => {
+                    const prices = allPrices[index] || [];
+                    const match = prices.find(rp => 
+                        rp.price !== null && 
+                        rp.price !== undefined && 
+                        normalizeStr(rp.retailerName).includes(selectedRetailer)
+                    );
+
+                    if (match) {
+                        p.filteredRetailerPrice = Number(match.price);
+                        p.filteredRetailerName = match.retailerName;
+                        filtered.push(p);
+                    }
+                });
+
+                displayProducts = filtered;
+            }
+
+            if (currentSortOrder === 'price-asc') {
+                displayProducts.sort((a, b) => {
+                    const priceA = a.filteredRetailerPrice ?? (a.minimumPrice !== null ? Number(a.minimumPrice) : Infinity);
+                    const priceB = b.filteredRetailerPrice ?? (b.minimumPrice !== null ? Number(b.minimumPrice) : Infinity);
+                    return priceA - priceB;
+                });
+            } else if (currentSortOrder === 'price-desc') {
+                displayProducts.sort((a, b) => {
+                    const priceA = a.filteredRetailerPrice ?? (a.minimumPrice !== null ? Number(a.minimumPrice) : -Infinity);
+                    const priceB = b.filteredRetailerPrice ?? (b.minimumPrice !== null ? Number(b.minimumPrice) : -Infinity);
+                    return priceB - priceA;
+                });
+            }
+
+            countLabel.textContent = `${displayProducts.length} προϊόντα`;
+
+            if (displayProducts.length === 0) {
+                container.innerHTML = `<p style="color:#71717a; font-size:13px;">Δεν βρέθηκαν προϊόντα ${selectedRetailer ? 'στο επιλεγμένο κατάστημα' : ''}.</p>`;
+                return;
+            }
+
+            container.innerHTML = '<div class="product-grid" id="pGrid"></div>';
+            const pGrid = document.getElementById('pGrid');
+
+            displayProducts.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'p-card';
+
+                const rawImg = p.imageURL || p.imageUrl || null;
+                const imgSrc = formatImageUrl(rawImg);
+
+                const imgHtml = imgSrc 
+                    ? `<img src="${imgSrc}" class="p-img" alt="${p.name || ''}" loading="lazy" onerror="this.onerror=null; this.outerHTML='<div class=\\'img-placeholder\\'>[ IMG ]</div>';">`
+                    : `<div class="img-placeholder">[ IMG ]</div>`;
+
+                let priceText = '--€';
+                let priceLabel = 'Ελάχιστη';
+
+                if (selectedRetailer && p.filteredRetailerPrice !== undefined) {
+                    priceText = `${p.filteredRetailerPrice.toFixed(2)}€`;
+                    priceLabel = p.filteredRetailerName || 'Τιμή';
+                } else if (p.minimumPrice !== null && p.minimumPrice !== undefined) {
+                    priceText = `${Number(p.minimumPrice).toFixed(2)}€`;
+                }
+
+                card.innerHTML = `
+                    <div class="p-card-top">
+                        ${imgHtml}
+                    </div>
+                    <div class="p-title" title="${p.name || ''}">${p.name || 'Χωρίς όνομα'}</div>
+                    <div class="p-pricing-row">
+                        <span class="p-price-label">${priceLabel}</span>
+                        <div class="p-main-price">${priceText}</div>
+                    </div>
+                    <button class="p-add-btn" onclick="event.stopPropagation(); addToList(${JSON.stringify(p).replace(/"/g, '&quot;')});">
+                        + Προσθήκη
+                    </button>
+                `;
+
+                // clicking card opens the full product page
+                card.onclick = () => openProductDetails(p);
+                pGrid.appendChild(card);
+            });
+        }
+
+        // hide search dropdown container
+        function hideSearchDropdown() {
+            const dropdown = document.getElementById('searchDropdown');
+            if (dropdown) dropdown.style.display = 'none';
+        }
+
+        // render dropdown search results safely using DOM elements
+        function renderSearchDropdown(products) {
+            const dropdown = document.getElementById('searchDropdown');
+            if (!dropdown) return;
+
+            dropdown.innerHTML = '';
+
+            if (products.length === 0) {
+                dropdown.innerHTML = '<div style="padding: 12px 16px; font-size: 13px; color: #71717a;">Δεν βρέθηκαν προϊόντα.</div>';
+                dropdown.style.display = 'block';
+                return;
+            }
+
+            const header = document.createElement('div');
+            header.className = 'search-dropdown-header';
+            header.textContent = 'Αποτελέσματα';
+            dropdown.appendChild(header);
+
+            products.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'search-dropdown-item';
+
+                const left = document.createElement('div');
+                left.className = 'search-item-left';
+
+                const thumb = document.createElement('div');
+                thumb.className = 'search-item-thumb';
+
+                const imgSrc = formatImageUrl(p.imageURL || p.imageUrl);
+                if (imgSrc) {
+                    const img = document.createElement('img');
+                    img.src = imgSrc;
+                    img.alt = p.name || '';
+                    img.onerror = () => {
+                        thumb.innerHTML = '<div class="img-placeholder" style="font-size:9px;">[ IMG ]</div>';
+                    };
+                    thumb.appendChild(img);
+                } else {
+                    thumb.innerHTML = '<div class="img-placeholder" style="font-size:9px;">[ IMG ]</div>';
+                }
+
+                const info = document.createElement('div');
+                info.className = 'search-item-info';
+
+                const title = document.createElement('div');
+                title.className = 'search-item-title';
+                title.textContent = p.name || 'Χωρίς όνομα';
+                title.title = p.name || '';
+
+                const price = document.createElement('div');
+                price.className = 'search-item-price';
+                price.textContent = (p.minimumPrice !== null && p.minimumPrice !== undefined)
+                    ? `από €${Number(p.minimumPrice).toFixed(2)}`
+                    : '--€';
+
+                info.appendChild(title);
+                info.appendChild(price);
+
+                left.appendChild(thumb);
+                left.appendChild(info);
+
+                const arrow = document.createElement('div');
+                arrow.className = 'search-item-arrow';
+                arrow.textContent = '>';
+
+                item.appendChild(left);
+                item.appendChild(arrow);
+
+                // clicking dropdown item opens the full product page
+                item.onclick = () => {
+                    hideSearchDropdown();
+                    openProductDetails(p);
+                };
+
+                dropdown.appendChild(item);
+            });
+
+            dropdown.style.display = 'block';
+        }
+
+        // execute full page search on Enter press
+        async function submitFullSearch(query) {
+            hideSearchDropdown();
+
+            navHistory = [
+                { type: 'cat', id: null, name: 'Αρχική' },
+                { type: 'search', id: 'search', name: `Αναζήτηση: "${query}"`, queryText: query }
+            ];
+            renderBreadcrumbs();
+
+            const viewTitle = document.getElementById('viewTitle');
+            viewTitle.textContent = `Αποτελέσματα για "${query}"`;
+
+            document.getElementById('titleArea').style.display = 'flex';
+            document.getElementById('subcatChipsContainer').style.display = 'none';
+
+            const container = document.getElementById('dynamicContainer');
+            const countLabel = document.getElementById('itemsCount');
+
+            countLabel.textContent = '';
+            container.innerHTML = '<p style="color:#71717a; font-size:13px;">Αναζήτηση όλων των προϊόντων...</p>';
+
+            try {
+                const res = await fetch(`/api/products/search?q=${encodeURIComponent(query)}`);
+                if (!res.ok) {
+                    container.innerHTML = '<p style="color:#71717a; font-size:13px;">Σφάλμα κατά την αναζήτηση.</p>';
+                    return;
+                }
+
+                const products = await res.json();
+                currentLoadedProducts = products;
+                renderProductsGrid(products);
+            } catch (err) {
+                container.innerHTML = `<p style="color:#71717a; font-size:13px;">Σφάλμα: ${err.message}</p>`;
+            }
+        }
+
+        // listen for search input with 250ms debounce for quick dropdown
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+
+            clearTimeout(searchDebounceTimer);
+
+            if (query.length < 2) {
+                hideSearchDropdown();
+                return;
+            }
+
+            searchDebounceTimer = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/api/products/search?q=${encodeURIComponent(query)}&limit=12`);
+                    if (res.ok) {
+                        const products = await res.json();
+                        renderSearchDropdown(products);
+                    }
+                } catch {
+                    hideSearchDropdown();
+                }
+            }, 250);
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const query = e.target.value.trim();
+                if (query.length >= 2) {
+                    clearTimeout(searchDebounceTimer);
+                    submitFullSearch(query);
+                }
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            const searchBar = document.querySelector('.search-bar');
+            if (searchBar && !searchBar.contains(e.target)) {
+                hideSearchDropdown();
+            }
+        });
+
+        // update breadcrumbs line based on history
+        function renderBreadcrumbs() {
+            const container = document.getElementById('breadcrumbs');
+            const title = document.getElementById('viewTitle');
+            container.innerHTML = '';
+
+            const current = navHistory[navHistory.length - 1];
+
+            if (current.type === 'search') {
+                title.textContent = `Αποτελέσματα για "${current.queryText || ''}"`;
+            } else {
+                title.textContent = current.name === 'Αρχική' ? 'Κατηγορίες' : current.name;
+            }
+
+            navHistory.forEach((item, index) => {
+                if (index === navHistory.length - 1) {
+                    const span = document.createElement('span');
+                    span.className = 'current-crumb';
+                    span.textContent = item.name;
+                    container.appendChild(span);
+                } else {
+                    const link = document.createElement('span');
+                    link.className = 'breadcrumb-item';
+                    link.textContent = item.name;
+                    link.onclick = () => {
+                        navHistory = navHistory.slice(0, index + 1);
+                        if (item.type === 'cat') {
+                            loadNavigation(item.id);
+                        } else if (item.type === 'cart') {
+                            viewShoppingList();
+                        } else if (item.type === 'search') {
+                            submitFullSearch(item.queryText);
+                        }
+                    };
+                    container.appendChild(link);
+
+                    const sep = document.createElement('span');
+                    sep.className = 'breadcrumb-separator';
+                    sep.textContent = '>';
+                    container.appendChild(sep);
+                }
+            });
+        }
+
+        // reset navigation state to root categories
+        function resetToRoot() {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+            hideSearchDropdown();
+
+            navHistory = [{ type: 'cat', id: null, name: 'Αρχική' }];
+            loadNavigation(null);
+        }
+
+        /*
+         * App bootstrap lifecycle.
+         * Fetches supermarket logos from SQLite first so logos are available
+         * before rendering category, product, or shopping list views.
+         */
+        async function initApp() {
+            updateCartBadge();
+            await loadSupermarketLogos();
+            await loadNavigation();
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
