@@ -38,6 +38,7 @@ public static class ScraperService
         Console.WriteLine($"Stored categories in DB. Found {targetCategoryIds.Count} leaf categories with products.\n");
 
         int totalProductsScraped = 0;
+        int totalSkipped = 0;
 
         foreach (var categoryId in targetCategoryIds)
         {
@@ -68,7 +69,7 @@ public static class ScraperService
 
                         totalProductsScraped += data.Products.Count;
 
-                        await SaveProductsAsync(data.Products, categoryId, connection);
+                        totalSkipped += await SaveProductsAsync(data.Products, categoryId, connection);
                     }
                     else
                     {
@@ -91,13 +92,13 @@ public static class ScraperService
             } while (currentPage <= totalPages);
         }
 
-        Console.WriteLine($"\nScraping finished. Total items processed: {totalProductsScraped}");
+        Console.WriteLine($"\nScraping finished. Total items processed: {totalProductsScraped}, skipped: {totalSkipped}");
     }
 
     /* Saves a batch of products and their corresponding supermarket prices.
       Uses a single SQLite transaction and pre-allocated SQL parameters to minimize
       disk I/O overhead and maximize bulk insert speed. */
-    private static async Task SaveProductsAsync(List<ProductDetails> products, string categoryId, SqliteConnection connection)
+    private static async Task<int> SaveProductsAsync(List<ProductDetails> products, string categoryId, SqliteConnection connection)
     {
         using var transaction = connection.BeginTransaction();
 
@@ -116,10 +117,11 @@ public static class ScraperService
         using var productCmd = connection.CreateCommand();
         productCmd.Transaction = transaction;
         productCmd.CommandText = """
-            INSERT OR REPLACE INTO Products (Id, Name, MinimumPrice, ImageURL, CategoryId, ProductBio)
-            VALUES (@Id, @Name, @MinimumPrice, @ImageURL, @CategoryId, @ProductBio);
+        INSERT OR REPLACE INTO Products (Id, Name, NameSearch, MinimumPrice, ImageURL, CategoryId, ProductBio)
+        VALUES (@Id, @Name, @NameSearch, @MinimumPrice, @ImageURL, @CategoryId, @ProductBio);
         """;
 
+        var pNameSearch = productCmd.Parameters.Add("@NameSearch", SqliteType.Text);
         var pId = productCmd.Parameters.Add("@Id", SqliteType.Text);
         var pName = productCmd.Parameters.Add("@Name", SqliteType.Text);
         var pMinimumPrice = productCmd.Parameters.Add("@MinimumPrice", SqliteType.Real);
@@ -141,39 +143,77 @@ public static class ScraperService
         var pRetailerName = priceCmd.Parameters.Add("@RetailerName", SqliteType.Text);
         var pPrice = priceCmd.Parameters.Add("@Price", SqliteType.Real);
 
+        // Counts products we refuse to store, so bad data is visible instead of silent
+        int skipped = 0;
+
         foreach (var product in products)
         {
-            pId.Value = product.Id ?? (object)DBNull.Value;
-            pName.Value = product.Name ?? (object)DBNull.Value;
-            pMinimumPrice.Value = (object?)product.ProductMinimumPrice?.MinimumPrice ?? DBNull.Value;
-            pImageURL.Value = product.ImageURL ?? (object)DBNull.Value;
-            pProductBio.Value = (object?)product.ProductBio ?? DBNull.Value;
+            /* A product without an id or a name can't be stored (the id is the primary key
+               and the name is NOT NULL), so skip it before touching the database. */
+            if (string.IsNullOrWhiteSpace(product.Id) || string.IsNullOrWhiteSpace(product.Name))
+            {
+                skipped++;
+                Console.WriteLine("Skipped a product with a missing id or name.");
+                continue;
+            }
 
-            await productCmd.ExecuteNonQueryAsync();
+            /* Collect only the retailer prices we can trust. A price is unusable if it is
+               missing or not positive, because a price of 0 would wrongly look like the
+               cheapest option. A blank retailer name can't be linked to a supermarket either. */
+            var validPrices = new List<(string Retailer, decimal Price)>();
 
             if (product.ProductPricePerRetailer != null)
             {
                 foreach (var rp in product.ProductPricePerRetailer)
                 {
-                    if (string.IsNullOrWhiteSpace(rp.RetailerDisplayName)) continue;
+                    var retailerName = rp.RetailerDisplayName?.Trim();
 
-                    string cleanRetailerName = rp.RetailerDisplayName.Trim();
+                    if (string.IsNullOrEmpty(retailerName) || rp.Price is null or <= 0)
+                        continue;
 
-                    // Register unseen retailer name if missing so the foreign key constraint succeeds
-                    pMarketName.Value = cleanRetailerName;
-                    await ensureMarketCmd.ExecuteNonQueryAsync();
-
-                    // Link each price entry to the parent product ID and supermarket display name
-                    pPriceProductId.Value = product.Id ?? (object)DBNull.Value;
-                    pRetailerName.Value = cleanRetailerName;
-                    pPrice.Value = (object?)rp.Price ?? DBNull.Value;
-
-                    await priceCmd.ExecuteNonQueryAsync();
+                    validPrices.Add((retailerName, rp.Price.Value));
                 }
+            }
+
+            /* A product with no usable price is useless to a price comparison site.
+               Skipping it here also avoids the NOT NULL failure on MinimumPrice,
+               which used to fail the whole page. */
+            if (validPrices.Count == 0)
+            {
+                skipped++;
+                Console.WriteLine($"Skipped product {product.Id}: no valid prices.");
+                continue;
+            }
+
+            /* MinimumPrice is computed from the valid prices, so it always matches
+            what ends up in ProductPrices instead of trusting the API's price_stats. */
+            pId.Value = product.Id;
+            pName.Value = product.Name;
+            // Store the cleaned copy of the name that the search endpoint will match against
+            pNameSearch.Value = TextNormalizer.ForSearch(product.Name);
+            pMinimumPrice.Value = validPrices.Min(p => p.Price);
+            pImageURL.Value = product.ImageURL ?? (object)DBNull.Value;
+            pProductBio.Value = product.ProductBio ?? (object)DBNull.Value;
+
+            await productCmd.ExecuteNonQueryAsync();
+
+            foreach (var (retailer, price) in validPrices)
+            {
+                // Register the retailer if it is new, so the foreign key doesn't fail
+                pMarketName.Value = retailer;
+                await ensureMarketCmd.ExecuteNonQueryAsync();
+
+                pPriceProductId.Value = product.Id;
+                pRetailerName.Value = retailer;
+                pPrice.Value = price;
+
+                await priceCmd.ExecuteNonQueryAsync();
             }
         }
 
         // Commit all product and price inserts in one batch
         await transaction.CommitAsync();
+
+        return skipped;
     }
 }

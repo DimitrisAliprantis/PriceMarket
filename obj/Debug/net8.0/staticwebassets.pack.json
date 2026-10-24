@@ -1,47 +1,47 @@
 {
   "Files": [
     {
-      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\index.html",
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\index.html",
       "PackagePath": "staticwebassets\\index.html"
     },
     {
-      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\ab.png",
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\ab.png",
       "PackagePath": "staticwebassets\\logos\\ab.png"
     },
     {
-      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\bazaar.png",
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\bazaar.png",
       "PackagePath": "staticwebassets\\logos\\bazaar.png"
     },
     {
-      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\chalkiadakis.png",
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\chalkiadakis.png",
       "PackagePath": "staticwebassets\\logos\\chalkiadakis.png"
     },
     {
-      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\galaxias.png",
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\galaxias.png",
       "PackagePath": "staticwebassets\\logos\\galaxias.png"
     },
     {
-      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\kritikos.jpg",
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\kritikos.jpg",
       "PackagePath": "staticwebassets\\logos\\kritikos.jpg"
     },
     {
-      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\lidl.png",
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\lidl.png",
       "PackagePath": "staticwebassets\\logos\\lidl.png"
     },
     {
-      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\masoutis.webp",
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\masoutis.webp",
       "PackagePath": "staticwebassets\\logos\\masoutis.webp"
     },
     {
-      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\mymarket.jpg",
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\mymarket.jpg",
       "PackagePath": "staticwebassets\\logos\\mymarket.jpg"
     },
     {
-      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\sklavenitis.png",
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\sklavenitis.png",
       "PackagePath": "staticwebassets\\logos\\sklavenitis.png"
     },
     {
-      "Id": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\synka.jpg",
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\synka.jpg",
       "PackagePath": "staticwebassets\\logos\\synka.jpg"
     },
     {

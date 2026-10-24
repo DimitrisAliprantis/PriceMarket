@@ -33,9 +33,9 @@ public class ProductDetails
 
 public class ProductMinimumPrice
 {
-    
+    // we allow price to be null so when scraping it doesnt throw an exception if the price is missing, we can just ignore it and move on to the next product
     [JsonPropertyName("min_price")]
-    public decimal MinimumPrice { get; set; }
+    public decimal? MinimumPrice { get; set; }
 
 }
 
@@ -47,7 +47,7 @@ public class ProductPricePerRetailer
     public string? RetailerDisplayName { get; set; }
 
     [JsonPropertyName("price")]
-    public decimal Price { get; set; }
+    public decimal? Price { get; set; }
 
 }
 

@@ -14,8 +14,8 @@ public static class DatabaseInitializer
         using var connection = new SqliteConnection(ConnectionString);
         await connection.OpenAsync();
 
-        // Read database.sql script
-        string sql = await File.ReadAllTextAsync("database.sql");
+        // Read PriceMarket.sql script
+        string sql = await File.ReadAllTextAsync("PriceMarket.sql");
 
         using var command = connection.CreateCommand();
         // Activate foreign key support for the current connection

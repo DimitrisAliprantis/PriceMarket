@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("posokanei")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f160cbdb15e45ef68caa53fbce9f3e2c908ea2ad")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fb0e5d40708c1d9cad3642f464f0851db809d6b4")]
 [assembly: System.Reflection.AssemblyProductAttribute("posokanei")]
 [assembly: System.Reflection.AssemblyTitleAttribute("posokanei")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

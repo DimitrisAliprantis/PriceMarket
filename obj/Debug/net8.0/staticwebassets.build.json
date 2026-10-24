@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "WRTp8l95p5Jxv9fKiyq03F5PUMFMR8VBT8rjhEFJXio=",
+  "Hash": "7WR4gOsCTYQmrVbwCThkwqd/Om8d2QR+84bLsXXVVVQ=",
   "Source": "posokanei",
   "BasePath": "_content/posokanei",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "posokanei\\wwwroot",
       "Source": "posokanei",
-      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\",
       "BasePath": "_content/posokanei",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\index.html",
+      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\index.html",
       "SourceId": "posokanei",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\",
       "BasePath": "_content/posokanei",
       "RelativePath": "index.html",
       "AssetKind": "All",
@@ -36,10 +36,10 @@
       "OriginalItemSpec": "wwwroot\\index.html"
     },
     {
-      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\ab.png",
+      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\ab.png",
       "SourceId": "posokanei",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\",
       "BasePath": "_content/posokanei",
       "RelativePath": "logos/ab.png",
       "AssetKind": "All",
@@ -55,10 +55,10 @@
       "OriginalItemSpec": "wwwroot\\logos\\ab.png"
     },
     {
-      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\bazaar.png",
+      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\bazaar.png",
       "SourceId": "posokanei",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\",
       "BasePath": "_content/posokanei",
       "RelativePath": "logos/bazaar.png",
       "AssetKind": "All",
@@ -74,10 +74,10 @@
       "OriginalItemSpec": "wwwroot\\logos\\bazaar.png"
     },
     {
-      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\chalkiadakis.png",
+      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\chalkiadakis.png",
       "SourceId": "posokanei",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\",
       "BasePath": "_content/posokanei",
       "RelativePath": "logos/chalkiadakis.png",
       "AssetKind": "All",
@@ -93,10 +93,10 @@
       "OriginalItemSpec": "wwwroot\\logos\\chalkiadakis.png"
     },
     {
-      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\galaxias.png",
+      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\galaxias.png",
       "SourceId": "posokanei",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\",
       "BasePath": "_content/posokanei",
       "RelativePath": "logos/galaxias.png",
       "AssetKind": "All",
@@ -112,10 +112,10 @@
       "OriginalItemSpec": "wwwroot\\logos\\galaxias.png"
     },
     {
-      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\kritikos.jpg",
+      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\kritikos.jpg",
       "SourceId": "posokanei",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\",
       "BasePath": "_content/posokanei",
       "RelativePath": "logos/kritikos.jpg",
       "AssetKind": "All",
@@ -131,10 +131,10 @@
       "OriginalItemSpec": "wwwroot\\logos\\kritikos.jpg"
     },
     {
-      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\lidl.png",
+      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\lidl.png",
       "SourceId": "posokanei",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\",
       "BasePath": "_content/posokanei",
       "RelativePath": "logos/lidl.png",
       "AssetKind": "All",
@@ -150,10 +150,10 @@
       "OriginalItemSpec": "wwwroot\\logos\\lidl.png"
     },
     {
-      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\masoutis.webp",
+      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\masoutis.webp",
       "SourceId": "posokanei",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\",
       "BasePath": "_content/posokanei",
       "RelativePath": "logos/masoutis.webp",
       "AssetKind": "All",
@@ -169,10 +169,10 @@
       "OriginalItemSpec": "wwwroot\\logos\\masoutis.webp"
     },
     {
-      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\mymarket.jpg",
+      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\mymarket.jpg",
       "SourceId": "posokanei",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\",
       "BasePath": "_content/posokanei",
       "RelativePath": "logos/mymarket.jpg",
       "AssetKind": "All",
@@ -188,10 +188,10 @@
       "OriginalItemSpec": "wwwroot\\logos\\mymarket.jpg"
     },
     {
-      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\sklavenitis.png",
+      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\sklavenitis.png",
       "SourceId": "posokanei",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\",
       "BasePath": "_content/posokanei",
       "RelativePath": "logos/sklavenitis.png",
       "AssetKind": "All",
@@ -207,10 +207,10 @@
       "OriginalItemSpec": "wwwroot\\logos\\sklavenitis.png"
     },
     {
-      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\logos\\synka.jpg",
+      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\logos\\synka.jpg",
       "SourceId": "posokanei",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\Poso kanei file\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\",
       "BasePath": "_content/posokanei",
       "RelativePath": "logos/synka.jpg",
       "AssetKind": "All",
