@@ -45,6 +45,10 @@
       "PackagePath": "staticwebassets\\logos\\synka.jpg"
     },
     {
+      "Id": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\productList.js",
+      "PackagePath": "staticwebassets\\productList.js"
+    },
+    {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.posokanei.props",
       "PackagePath": "build\\posokanei.props"
     },

@@ -98,56 +98,7 @@ class Program
             }
         });
 
-        app.MapGet("/api/products", async (string? categoryId, int? page, int? pageSize) =>
-        {
-            if (string.IsNullOrEmpty(categoryId))
-            {
-                return Results.BadRequest(new { error = "CategoryId is required." });
-            }
-
-            /* Work out which slice of the results to return. Both values are limited so
-            nobody can request the whole table or an absurd page number. */
-            var size = Math.Clamp(pageSize ?? 36, 1, 100);
-            var offset = (Math.Clamp(page ?? 1, 1, 10000) - 1) * size;
-
-            using var connection = new SqliteConnection(ConnectionString);
-            await connection.OpenAsync();
-
-            using var command = connection.CreateCommand();
-            command.CommandText = @"
-                WITH RECURSIVE SubCats(Id) AS (
-                    SELECT Id FROM Categories WHERE Id = @categoryId
-                    UNION ALL
-                    SELECT c.Id FROM Categories c JOIN SubCats sc ON c.ParentId = sc.Id
-                )
-                SELECT p.Id, p.Name, p.MinimumPrice, p.ProductBio, p.ImageURL
-                FROM Products p
-                WHERE p.CategoryId IN (SELECT Id FROM SubCats)
-                ORDER BY p.NameSearch, p.Id
-                LIMIT @limit OFFSET @offset;";
-
-            command.Parameters.AddWithValue("@categoryId", categoryId);
-            command.Parameters.AddWithValue("@limit", size);
-            command.Parameters.AddWithValue("@offset", offset);
-
-            using var reader = await command.ExecuteReaderAsync();
-            var results = new List<object>();
-
-            while (await reader.ReadAsync())
-            {
-                results.Add(new
-                {
-                    Id = reader.IsDBNull(0) ? null : reader.GetString(0),
-                    Name = reader.IsDBNull(1) ? null : reader.GetString(1),
-                    MinimumPrice = reader.IsDBNull(2) ? (decimal?)null : reader.GetDecimal(2),
-                    ProductBio = reader.IsDBNull(3) ? null : reader.GetString(3),
-                    ImageURL = reader.IsDBNull(4) ? null : reader.GetString(4)
-                });
-            }
-
-            return Results.Ok(results);
-        });
-
+        
 
         // Endpoint to fetch all supermarkets with their logos
         app.MapGet("/api/supermarkets", async () =>
@@ -206,67 +157,7 @@ class Program
             return Results.Ok(prices);
         });
 
-        app.MapGet("/api/products/search", async (string? q, int? page, int? pageSize) =>
-        {
-            // Clean the user's text exactly like the stored names were cleaned
-            var cleanQuery = TextNormalizer.ForSearch(q);
-
-            // Too short gives useless results, too long is probably abuse
-            if (cleanQuery.Length < 2 || cleanQuery.Length > 50)
-            {
-                return Results.Ok(new List<object>());
-            }
-
-            // Only the first 5 words count, so nobody can build a huge query
-            var words = cleanQuery.Split(' ').Take(5).ToArray();
-
-            var size = Math.Clamp(pageSize ?? 36, 1, 100);
-            var offset = (Math.Clamp(page ?? 1, 1, 10000) - 1) * size;
-
-            using var connection = new SqliteConnection(ConnectionString);
-            await connection.OpenAsync();
-
-            using var command = connection.CreateCommand();
-
-            /* Every typed word must be the start of some word in the name. The first pattern
-            covers the first word of the name, the second one (with the leading space)
-            covers every later word. Only the parameter NAMES are added to the SQL text,
-            the user's letters always travel as parameters, so injection is still impossible. */
-            var conditions = new List<string>();
-            for (int i = 0; i < words.Length; i++)
-            {
-                conditions.Add($"(NameSearch LIKE @start{i} OR NameSearch LIKE @word{i})");
-                command.Parameters.AddWithValue($"@start{i}", words[i] + "%");
-                command.Parameters.AddWithValue($"@word{i}", "% " + words[i] + "%");
-            }
-
-            command.CommandText = $@"
-                SELECT Id, Name, MinimumPrice, ProductBio, ImageURL
-                FROM Products
-                WHERE {string.Join(" AND ", conditions)}
-                ORDER BY NameSearch, Id
-                LIMIT @limit OFFSET @offset;";
-
-            command.Parameters.AddWithValue("@limit", size);
-            command.Parameters.AddWithValue("@offset", offset);
-
-            using var reader = await command.ExecuteReaderAsync();
-            var results = new List<object>();
-
-            while (await reader.ReadAsync())
-            {
-                results.Add(new
-                {
-                    Id = reader.IsDBNull(0) ? null : reader.GetString(0),
-                    Name = reader.GetString(1),
-                    MinimumPrice = reader.IsDBNull(2) ? (decimal?)null : reader.GetDecimal(2),
-                    ProductBio = reader.IsDBNull(3) ? null : reader.GetString(3),
-                    ImageURL = reader.IsDBNull(4) ? null : reader.GetString(4)
-                });
-            }
-
-            return Results.Ok(results);
-        });
+            app.MapProductEndpoints(ConnectionString);
             app.Run();
 
         

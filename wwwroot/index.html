@@ -1134,6 +1134,39 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* next page button under the product grid, aligned to the right */
+        .load-more-wrap {
+            display: flex;
+            justify-content: flex-end;
+            margin: 24px 0 8px;
+        }
+
+        .load-more-btn {
+            background: #18181b;
+            color: #ffffff;
+            border: none;
+            border-radius: 9999px;
+            padding: 11px 26px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transition: background 0.15s, transform 0.1s;
+        }
+
+        .load-more-btn:hover:not(:disabled) {
+            background: #3f3f46;
+        }
+
+        .load-more-btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+
+        .load-more-btn:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
     </style>
 </head>
 <body>
@@ -1202,12 +1235,15 @@
         </div>
     </div>
 
+    <script src="productList.js"></script>
+
     <script>
         const CART_STORAGE_KEY = 'posokanei_shopping_cart';
         let navHistory = [{ type: 'cat', id: null, name: 'Αρχική' }];
         let selectedRetailer = '';
         let currentSortOrder = 'default';
-        let currentLoadedProducts = [];
+        // Exact supermarket name sent to the API (selectedRetailer stays the normalized copy)
+        let selectedRetailerName = '';
         let searchDebounceTimer = null;
 
         // In-memory cache for supermarket logos fetched from SQLite database
@@ -1306,28 +1342,26 @@
             return `<div class="store-brand-logo" style="background:${bg}; color:${color}; border-color:${border};">${short}</div>`;
         }
 
-        // handle changes to active supermarket filter
         function onRetailerFilterChange(val) {
+            const select = document.getElementById('supermarketFilter');
+            selectedRetailerName = val ? select.options[select.selectedIndex].textContent.trim() : '';
             selectedRetailer = normalizeStr(val);
-            const current = navHistory[navHistory.length - 1];
 
-            if ((current.type === 'cat' && current.id !== null) || current.type === 'search') {
-                renderProductsGrid(currentLoadedProducts);
-            } else if (current.type === 'product' && current.productData) {
+            // A product list is on screen: ask the server for page 1 again with the new filter
+            if (productListState) { restartProductList(); return; }
+
+            const current = navHistory[navHistory.length - 1];
+            if (current.type === 'product' && current.productData) {
+                navHistory.pop(); // openProductDetails adds the entry again
                 openProductDetails(current.productData);
             } else if (current.type === 'cart') {
                 viewShoppingList();
             }
-        }
+     }
 
-        // handle price sort order change
         function onSortOrderChange(val) {
             currentSortOrder = val;
-            const current = navHistory[navHistory.length - 1];
-
-            if ((current.type === 'cat' && current.id !== null) || current.type === 'search') {
-                renderProductsGrid(currentLoadedProducts);
-            }
+            if (productListState) restartProductList();
         }
 
         // read items from localstorage
@@ -1432,6 +1466,7 @@
            FULL PRODUCT DETAIL VIEW (SPLIT LAYOUT)
            ======================================================== */
         async function openProductDetails(product) {
+            productListState = null;
             hideSearchDropdown();
             navHistory.push({ type: 'product', id: product.id, name: product.name, productData: product });
             renderBreadcrumbs();
@@ -1531,6 +1566,7 @@
            POSOKANEI SHOPPING LIST VIEW & ACCORDIONS
            ======================================================== */
         async function viewShoppingList() {
+            productListState = null;
             navHistory = [{ type: 'cat', id: null, name: 'Αρχική' }, { type: 'cart', id: 'cart', name: 'Ψώνια Εβδομάδας' }];
             renderBreadcrumbs();
 
@@ -1842,6 +1878,7 @@
            CATEGORY & PRODUCT BROWSING
            ======================================================== */
         async function loadNavigation(parentId = null) {
+            productListState = null;
             renderBreadcrumbs();
             document.getElementById('titleArea').style.display = 'flex';
             const container = document.getElementById('dynamicContainer');
@@ -1891,152 +1928,38 @@
                         catGrid.appendChild(card);
                     });
 
-                } else {
-                    container.innerHTML = '<p style="color:#71717a; font-size:13px;">Φόρτωση προϊόντων...</p>';
+            } else {
+            /* Last level: show the products of this category. If it has subcategories,
+            they become chips above the list. */
+            if (categories.length > 0) {
+                chipsBar.style.display = 'flex';
+                chipsBar.innerHTML = '';
 
-                    const prodsRes = await fetch(`/api/products?categoryId=${parentId}`);
-                    const products = prodsRes.ok ? await prodsRes.json() : [];
-                    currentLoadedProducts = products;
+                const addChip = (label, categoryId, active) => {
+                    const chip = document.createElement('button');
+                    chip.className = 'subcat-chip' + (active ? ' active' : '');
+                    chip.textContent = label;
+                    chip.onclick = () => {
+                        document.querySelectorAll('.subcat-chip').forEach(c => c.classList.remove('active'));
+                        chip.classList.add('active');
+                        startProductList('category', categoryId);
+                    };
+                    chipsBar.appendChild(chip);
+                };
 
-                    if (categories.length > 0) {
-                        chipsBar.style.display = 'flex';
-                        chipsBar.innerHTML = '';
+                addChip('Όλα', parentId, true);
+                categories.forEach(sub => addChip(sub.name, sub.id, false));
+            }
 
-                        const allChip = document.createElement('button');
-                        allChip.className = 'subcat-chip active';
-                        allChip.textContent = `Όλα (${products.length})`;
-                        allChip.onclick = () => {
-                            document.querySelectorAll('.subcat-chip').forEach(c => c.classList.remove('active'));
-                            allChip.classList.add('active');
-                            renderProductsGrid(currentLoadedProducts);
-                        };
-                        chipsBar.appendChild(allChip);
-
-                        categories.forEach(sub => {
-                            const chip = document.createElement('button');
-                            chip.className = 'subcat-chip';
-                            chip.textContent = sub.name;
-                            chip.onclick = async () => {
-                                document.querySelectorAll('.subcat-chip').forEach(c => c.classList.remove('active'));
-                                chip.classList.add('active');
-                                
-                                container.innerHTML = '<p style="color:#71717a; font-size:13px;">Φόρτωση επιλεγμένων προϊόντων...</p>';
-                                const subProdsRes = await fetch(`/api/products?categoryId=${sub.id}`);
-                                const subProducts = subProdsRes.ok ? await subProdsRes.json() : [];
-                                renderProductsGrid(subProducts);
-                            };
-                            chipsBar.appendChild(chip);
-                        });
-                    }
-
-                    renderProductsGrid(products);
-                }
-
+            if (parentId) startProductList('category', parentId);
+            else container.innerHTML = '<p style="color:#71717a; font-size:13px;">Δεν υπάρχουν κατηγορίες.</p>';
+        }
             } catch (err) {
                 container.innerHTML = `<p style="color:#71717a; font-size:13px;">Σφάλμα κατά τη φόρτωση: ${err.message}</p>`;
             }
         }
 
-        async function renderProductsGrid(products) {
-            const container = document.getElementById('dynamicContainer');
-            const countLabel = document.getElementById('itemsCount');
-
-            let displayProducts = [...products];
-
-            if (selectedRetailer) {
-                container.innerHTML = '<p style="color:#71717a; font-size:13px;">Φιλτράρισμα βάσει καταστήματος...</p>';
-
-                const pricePromises = displayProducts.map(p =>
-                    fetch(`/api/productprices?productId=${encodeURIComponent(p.id)}`)
-                        .then(r => r.ok ? r.json() : [])
-                        .catch(() => [])
-                );
-
-                const allPrices = await Promise.all(pricePromises);
-
-                const filtered = [];
-                displayProducts.forEach((p, index) => {
-                    const prices = allPrices[index] || [];
-                    const match = prices.find(rp => 
-                        rp.price !== null && 
-                        rp.price !== undefined && 
-                        normalizeStr(rp.retailerName).includes(selectedRetailer)
-                    );
-
-                    if (match) {
-                        p.filteredRetailerPrice = Number(match.price);
-                        p.filteredRetailerName = match.retailerName;
-                        filtered.push(p);
-                    }
-                });
-
-                displayProducts = filtered;
-            }
-
-            if (currentSortOrder === 'price-asc') {
-                displayProducts.sort((a, b) => {
-                    const priceA = a.filteredRetailerPrice ?? (a.minimumPrice !== null ? Number(a.minimumPrice) : Infinity);
-                    const priceB = b.filteredRetailerPrice ?? (b.minimumPrice !== null ? Number(b.minimumPrice) : Infinity);
-                    return priceA - priceB;
-                });
-            } else if (currentSortOrder === 'price-desc') {
-                displayProducts.sort((a, b) => {
-                    const priceA = a.filteredRetailerPrice ?? (a.minimumPrice !== null ? Number(a.minimumPrice) : -Infinity);
-                    const priceB = b.filteredRetailerPrice ?? (b.minimumPrice !== null ? Number(b.minimumPrice) : -Infinity);
-                    return priceB - priceA;
-                });
-            }
-
-            countLabel.textContent = `${displayProducts.length} προϊόντα`;
-
-            if (displayProducts.length === 0) {
-                container.innerHTML = `<p style="color:#71717a; font-size:13px;">Δεν βρέθηκαν προϊόντα ${selectedRetailer ? 'στο επιλεγμένο κατάστημα' : ''}.</p>`;
-                return;
-            }
-
-            container.innerHTML = '<div class="product-grid" id="pGrid"></div>';
-            const pGrid = document.getElementById('pGrid');
-
-            displayProducts.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'p-card';
-
-                const rawImg = p.imageURL || p.imageUrl || null;
-                const imgSrc = formatImageUrl(rawImg);
-
-                const imgHtml = imgSrc 
-                    ? `<img src="${imgSrc}" class="p-img" alt="${p.name || ''}" loading="lazy" onerror="this.onerror=null; this.outerHTML='<div class=\\'img-placeholder\\'>[ IMG ]</div>';">`
-                    : `<div class="img-placeholder">[ IMG ]</div>`;
-
-                let priceText = '--€';
-                let priceLabel = 'Ελάχιστη';
-
-                if (selectedRetailer && p.filteredRetailerPrice !== undefined) {
-                    priceText = `${p.filteredRetailerPrice.toFixed(2)}€`;
-                    priceLabel = p.filteredRetailerName || 'Τιμή';
-                } else if (p.minimumPrice !== null && p.minimumPrice !== undefined) {
-                    priceText = `${Number(p.minimumPrice).toFixed(2)}€`;
-                }
-
-                card.innerHTML = `
-                    <div class="p-card-top">
-                        ${imgHtml}
-                    </div>
-                    <div class="p-title" title="${p.name || ''}">${p.name || 'Χωρίς όνομα'}</div>
-                    <div class="p-pricing-row">
-                        <span class="p-price-label">${priceLabel}</span>
-                        <div class="p-main-price">${priceText}</div>
-                    </div>
-                    <button class="p-add-btn" onclick="event.stopPropagation(); addToList(${JSON.stringify(p).replace(/"/g, '&quot;')});">
-                        + Προσθήκη
-                    </button>
-                `;
-
-                // clicking card opens the full product page
-                card.onclick = () => openProductDetails(p);
-                pGrid.appendChild(card);
-            });
-        }
+        
 
         // hide search dropdown container
         function hideSearchDropdown() {
@@ -2125,7 +2048,7 @@
         }
 
         // execute full page search on Enter press
-        async function submitFullSearch(query) {
+        function submitFullSearch(query) {
             hideSearchDropdown();
 
             navHistory = [
@@ -2134,31 +2057,11 @@
             ];
             renderBreadcrumbs();
 
-            const viewTitle = document.getElementById('viewTitle');
-            viewTitle.textContent = `Αποτελέσματα για "${query}"`;
-
+            document.getElementById('viewTitle').textContent = `Αποτελέσματα για "${query}"`;
             document.getElementById('titleArea').style.display = 'flex';
             document.getElementById('subcatChipsContainer').style.display = 'none';
 
-            const container = document.getElementById('dynamicContainer');
-            const countLabel = document.getElementById('itemsCount');
-
-            countLabel.textContent = '';
-            container.innerHTML = '<p style="color:#71717a; font-size:13px;">Αναζήτηση όλων των προϊόντων...</p>';
-
-            try {
-                const res = await fetch(`/api/products/search?q=${encodeURIComponent(query)}`);
-                if (!res.ok) {
-                    container.innerHTML = '<p style="color:#71717a; font-size:13px;">Σφάλμα κατά την αναζήτηση.</p>';
-                    return;
-                }
-
-                const products = await res.json();
-                currentLoadedProducts = products;
-                renderProductsGrid(products);
-            } catch (err) {
-                container.innerHTML = `<p style="color:#71717a; font-size:13px;">Σφάλμα: ${err.message}</p>`;
-            }
+            startProductList('search', query);
         }
 
         // listen for search input with 250ms debounce for quick dropdown
@@ -2175,7 +2078,7 @@
 
             searchDebounceTimer = setTimeout(async () => {
                 try {
-                    const res = await fetch(`/api/products/search?q=${encodeURIComponent(query)}&limit=12`);
+                    const res = await fetch(`/api/products/search?q=${encodeURIComponent(query)}&pageSize=12`);
                     if (res.ok) {
                         const products = await res.json();
                         renderSearchDropdown(products);

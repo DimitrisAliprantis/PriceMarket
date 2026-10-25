@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "7WR4gOsCTYQmrVbwCThkwqd/Om8d2QR+84bLsXXVVVQ=",
+  "Hash": "nPa3Tl2bOsKUyjzh1uM8fh6WaQElP4eQDyYfSSbqY14=",
   "Source": "posokanei",
   "BasePath": "_content/posokanei",
   "Mode": "Default",
@@ -224,6 +224,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\logos\\synka.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\productList.js",
+      "SourceId": "posokanei",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\dimal\\Desktop\\C#\\PriceMarket\\wwwroot\\",
+      "BasePath": "_content/posokanei",
+      "RelativePath": "productList.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\productList.js"
     }
   ]
 }
